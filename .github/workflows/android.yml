@@ -87,4 +87,8 @@ jobs:
       - name: Upload artifact to release
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - Your Artifact Name
+          path: ${{ env.main_project_module }}/build/outputs/your-artifact-path
+          target_path: ${{ github.workspace }}/your-artifact-path
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
