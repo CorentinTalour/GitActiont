@@ -93,3 +93,26 @@ jobs:
         with:
           name: trivy-results
           path: 'trivy-results.txt'
+          
+  Notification:
+    name: Notification
+    runs-on: ubuntu-20.04
+    steps: 
+      - name: Install swaks
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y swaks
+          
+      - name: Send success notification
+        if: ${{ success() }}
+        run: |
+          echo "Subject: Workflow Success" > email.txt
+          echo "To: corentin.talour@bts-malraux.net" >> email.txt
+          echo "From: corentin.talour@bts-malraux.net" >> email.txt
+          echo "" >> email.txt
+          echo "The workflow was successful." >> email.txt
+          swaks --server smtp.gmail.com:587 --tls --auth \
+            --auth-user corentin.talour@bts-malraux.net --auth-password ${{ secrets.GMAIL_APP_PASSWORD }} \
+            --to corentin.talour@bts-malraux.net --from your-email@gmail.com \
+            --data email.txt
+
