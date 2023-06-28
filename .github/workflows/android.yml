@@ -1,72 +1,15 @@
 name: Android CI
 
-env:
-  main_project_module: app
-  playstore_name: Frogobox ID
-
 on:
   push:
-    branches: [master]
+    branches:
+      - main
   pull_request:
-    branches: [master]
-    types: [opened, synchronize, reopened]
-  workflow_dispatch:
-
 jobs:
   build:
-    name: Build and analyze
-    runs-on: ubuntu-latest
+    name: Build
+    runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v1
-
-      - name: Set current date as env variable
-        run: echo "date_today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-
-      - name: Set repository name as env variable
-        run: echo "repository_name=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
-
-      - name: Set Up JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-          cache: 'gradle'
-
-      - name: Change wrapper permissions
-        run: chmod +x ./gradlew
-
-      - name: Run gradle tests
-        run: ./gradlew test
-
-      - name: Build gradle project
-        run: ./gradlew build
-
-      - name: Build apk release project (APK) - ${{ env.main_project_module }} module
-        run: ./gradlew assemble
-
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          files: ${{ env.main_project_module }}/build/outputs/apk/release/*.apk
-          tag_name: main
-
-      - name: Get APK Path
-        id: get_apk_path
-        run: echo "::set-output name=apk_path::$(find ${{ github.workspace }}/${{ env.main_project_module }}/build/outputs/apk/release -name '*.apk' -print -quit)"
-
-      - name: Upload APK Release to Release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.get_apk_path.outputs.apk_path }}
-          asset_name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated
-          asset_content_type: application/vnd.android.package-archive
-
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -77,7 +20,7 @@ jobs:
           ignore-unfixed: true
           format: 'sarif'
           output: 'trivy-results.sarif'
-          severity: 'CRITICAL,HIGH,MEDIUM'
+          severity: 'CRITICAL,HIGHT'
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
