@@ -97,6 +97,7 @@ jobs:
   Notification:
     name: Notification
     runs-on: ubuntu-20.04
+    needs: [build, test]
     steps: 
       - name: Install swaks
         run: |
