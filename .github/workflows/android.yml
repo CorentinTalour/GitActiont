@@ -71,7 +71,6 @@ jobs:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated
           path: ${{ env.main_project_module }}/build/outputs/bundle/release/
 
-      - name: Create Release
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Create Release
