@@ -70,6 +70,20 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Release ${{ github.ref }}
+            - Frogobox ID - ${{ env.date_today }} - ${{ env.repository_name }}
+          draft: false
+          prerelease: false
+
       - name: Get APK Path
         id: get_apk_path
         run: echo "::set-output name=apk_path::$(find ${{ github.workspace }}/${{ env.main_project_module }}/build/outputs/apk/release -name '*.apk' -print -quit)"
@@ -83,7 +97,7 @@ jobs:
           asset_path: ${{ steps.get_apk_path.outputs.apk_path }}
           asset_name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated
           asset_content_type: application/vnd.android.package-archive
-        
+
       - name: Checkout code
         uses: actions/checkout@v3
 
