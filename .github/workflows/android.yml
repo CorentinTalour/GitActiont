@@ -62,9 +62,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ env.main_project_module }}/build/outputs/apk/release/*.apk
+          asset_path: ${{ github.workspace }}/${{ env.main_project_module }}/build/outputs/apk/release/*.apk
           asset_name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated
           asset_content_type: application/vnd.android.package-archive
+          working-directory: ${{ github.workspace }}/${{ env.main_project_module }}
+
 
   sonarcloud:
     name: SonarCloud Analysis
