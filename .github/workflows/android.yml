@@ -99,21 +99,15 @@ jobs:
     name: Notification
     runs-on: ubuntu-20.04
     needs: [build, test]
-    steps: 
-      - name: Install swaks
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y swaks
-          
-      - name: Send success notification
-        if: ${{ success() }}
-        run: |
-          echo "Subject: Workflow Success" > email.txt
-          echo "To: corentin.talour@bts-malraux.net" >> email.txt
-          echo "From: corentin.talour@bts-malraux.net" >> email.txt
-          echo "" >> email.txt
-          echo "The workflow was successful." >> email.txt
-          swaks --server smtp.gmail.com:587 --tls --auth \
-            --auth-user corentin.talour@bts-malraux.net --auth-password ${{ secrets.GMAIL_APP_PASSWORD }} \
-            --to corentin.talour@bts-malraux.net --from your-email@gmail.com \
-            --data email.txt
+    steps:
+      - name: ✨ Send email, you star
+        uses: dawidd6/action-send-mail@v1.3.0
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: corentin.talour@bts-malraux.net
+          password: ${{ secrets.GMAIL_PASS }}
+          subject: Your a star ✨
+          body: ${{ github.actor }} just starred your mail-on-star repo!!! ${{ github.repository }}
+          to: ${{ secrets.GMAIL_ADDRESS }}
+          from: ${{ secrets.GMAIL_ADDRESS }}
