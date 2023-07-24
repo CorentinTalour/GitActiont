@@ -40,37 +40,6 @@ jobs:
       - name: Build gradle project
         run: ./gradlew build
 
-  test:
-    name: Test
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Run Trivy vulnerability scanner in repo mode
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          ignore-unfixed: true
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'CRITICAL,HIGH,MEDIUM'
-
-      - name: Convert SARIF to TXT
-        run: cat trivy-results.sarif | jq -r '.runs[].results[].message' > trivy-results.txt
-
-      - name: Create Trivy scan artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: trivy-results
-          path: 'trivy-results.txt'
-          
-          
-  Release :
-    name: Release
-    runs-on: ubuntu-20.04
-    needs: [build, test]
-    steps: 
       - name: Build apk release project (APK) - ${{ env.main_project_module }} module
         run: ./gradlew assemble
         
@@ -99,6 +68,32 @@ jobs:
           asset_path: ${{ steps.get_apk_path.outputs.apk_path }}
           asset_name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated
           asset_content_type: application/vnd.android.package-archive
+
+  test:
+    name: Test
+    runs-on: ubuntu-20.04
+    needs: [build]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Trivy vulnerability scanner in repo mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+
+      - name: Convert SARIF to TXT
+        run: cat trivy-results.sarif | jq -r '.runs[].results[].message' > trivy-results.txt
+
+      - name: Create Trivy scan artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: trivy-results
+          path: 'trivy-results.txt'
           
   Notification:
     name: Notification
@@ -122,4 +117,3 @@ jobs:
             --auth-user corentin.talour@bts-malraux.net --auth-password ${{ secrets.GMAIL_APP_PASSWORD }} \
             --to corentin.talour@bts-malraux.net --from your-email@gmail.com \
             --data email.txt
-
