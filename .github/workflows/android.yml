@@ -130,6 +130,6 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
             upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: trivy-results.txt  # Chemin vers l'artefact que vous souhaitez télécharger
+            asset_path: test-results/trivy-results.txt  # Chemin complet vers l'artefact
             asset_name: trivy-results.txt  # Nom de l'artefact lorsqu'il est téléchargé
             asset_content_type: text/plain  # Type MIME de l'artefact
